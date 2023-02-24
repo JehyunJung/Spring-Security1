@@ -4,11 +4,6 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  security:
-    user:
-      name: user
-      password: 1111
-
   messages:
     basename: messages,errors
 
