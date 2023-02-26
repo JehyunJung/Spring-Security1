@@ -6,13 +6,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -32,28 +32,18 @@ import java.io.IOException;
 
 /*@Configuration
 @EnableWebSecurity*/
-public class MultipleSecurityConfigs {
-
+public class SecurityConfig2 {
     @Bean
-    @Order(0)
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         //인증 여부 처리
         httpSecurity
-                .securityMatcher("/admin/**")
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and().httpBasic();
-        return httpSecurity.build();
-    }
+                .anyRequest().authenticated();
+        httpSecurity.formLogin();
+        httpSecurity.rememberMe();
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain filterChain2(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity
-                .authorizeHttpRequests()
-                .anyRequest().permitAll()
-                .and()
-                .formLogin();
+        //메인 쓰레드와 자식 쓰레드가 같은 SecurityContext을 유지하도록 설정
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         return httpSecurity.build();
     }
 }
